@@ -5,7 +5,10 @@ import spark.Session;
 import spark.Spark;
 import spark.template.mustache.MustacheTemplateEngine;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 
 public class Main {
 
@@ -21,11 +24,17 @@ public class Main {
                     HashMap mustacheTags = new HashMap<>();
 
                     if (user == null) {
+                        Collection<User> currentUsers = users.values();
+                        ArrayList<Car> cars = new ArrayList<Car>();
+                        for (User person : currentUsers) {
+                            cars.addAll(person.cars);
+                        }
+                        mustacheTags.put("cars", cars);
                         return new ModelAndView(mustacheTags, "login.html");
                     }
                     else {
                         mustacheTags.put("user", user);
-
+                        mustacheTags.put("cars", user.cars);
                         return new ModelAndView(mustacheTags, "home.html");
                     }
 

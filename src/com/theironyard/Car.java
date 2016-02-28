@@ -17,4 +17,15 @@ public class Car {
         this.style = style;
         this.color = color;
     }
+
+    @Override
+    public String toString() {
+        return "Car{" +
+                "make='" + make + '\'' +
+                ", model='" + model + '\'' +
+                ", modelYear=" + modelYear +
+                ", style='" + style + '\'' +
+                ", color='" + color + '\'' +
+                '}';
+    }
 }

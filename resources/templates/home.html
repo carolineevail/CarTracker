@@ -1,5 +1,5 @@
 <html>
-<body>
+<ol>
 
 <!--{{#user}}-->
 Hello, {{user}}
@@ -26,23 +26,19 @@ Hello, {{user}}
 </form>
 <br/>
 
-<form action="/delete-entry" method="post">
-    <ol>
-        {{#cars}}
-        <li>{{car}}</li>
-        <button type="submit">Delete</button>
-        {{/cars}}
-    </ol>
-</form>
+<ol>
+{{#cars}}
+    <li>{{make}} - {{model}} - {{modelYear}} - {{style}} - {{color}}
+        <form action="/delete-entry" method="post">
+            <button type="submit">Delete</button>
+        </form>
 
-<form action="/edit-entry" method="post">
-    <ol>
-        {{#cars}}
-        <li>{{car}}</li>
-        <button type="submit">Edit</button>
-        {{/cars}}
-    </ol>
-</form>
+        <form action="/edit-entry" method="post">
+            <button type="submit">Edit</button>
+        </form>
+    </li>
+{{/cars}}
+</ol>
 <!--{{/user}}-->
 
 </body>
