@@ -20,6 +20,12 @@ public class Main {
                 ((request, response) -> {
                     Session session = request.session();
                     String userName = session.attribute("userName");
+                    if (userName == null) {
+                        users.put(userName, new User(userName));
+                    }
+                    else {
+                        users.containsKey().
+                    }
                 })
         )
     }
