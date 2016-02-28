@@ -1,16 +1,8 @@
 <html>
 <body>
 
-{{^userName}}
-<form action="/login" method="post">
-    <input type="text" placeholder="Enter your user name" name="loginName"/>
-    <button type="submit">Login</button>
-</form>
-<br/>
-{{/userName}}
-
-{{#userName}}
-Hello, {{userName}}
+{{#user}}
+Hello, {{user}}
 <form action="/logout" method="post">
     <button type="submit">Logout</button>
 </form>
@@ -51,7 +43,7 @@ Hello, {{userName}}
         {{/cars}}
     </ol>
 </form>
-{{/userName}}
+{{/user}}
 
 </body>
 </html>
