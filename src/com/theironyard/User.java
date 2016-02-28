@@ -8,6 +8,8 @@ import java.util.ArrayList;
 public class User {
     String name;
     int id;
+    ArrayList<Car> cars = new ArrayList<Car>();
+
 
     public User(String name, int id) {
         this.name = name;
@@ -17,6 +19,7 @@ public class User {
     public User(String name) {
         this.name = name;
     }
+
 
     @Override
     public String toString() {

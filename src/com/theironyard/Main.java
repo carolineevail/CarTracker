@@ -5,13 +5,11 @@ import spark.Session;
 import spark.Spark;
 import spark.template.mustache.MustacheTemplateEngine;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Main {
 
     static HashMap<String, User> users = new HashMap<>();
-    static ArrayList<Car> cars = new ArrayList<>();
 
     public static void main(String[] args) {
 
@@ -19,21 +17,42 @@ public class Main {
         Spark.get(
                 "/",
                 ((request, response) -> {
+                    User user = getUserFromSession(request.session());
                     HashMap mustacheTags = new HashMap<>();
-                    String name = request.queryParams("loginName");
-                    if (name == null) {
+
+                    if (user == null) {
                         return new ModelAndView(mustacheTags, "login.html");
                     }
                     else {
-                        Session session = request.session();
-                        User user = new User(name);
-                        users.put(name, user);
                         mustacheTags.put("user", user);
+
                         return new ModelAndView(mustacheTags, "home.html");
                     }
 
                 }),
                 new MustacheTemplateEngine()
+        );
+
+        Spark.post(
+                "/create-user",
+                ((request, response) -> {
+                    String name = request.queryParams("loginName");
+                    if (name == null) {
+                        throw new Exception("Login name is null.");
+                    }
+
+                    User user = users.get(name);
+                    if (user == null) {
+                        user = new User(name);
+                        users.put(name, user);
+                    }
+
+                    Session session = request.session();
+                    session.attribute("user", user);
+                    response.redirect("/");
+
+                    return "";
+                })
         );
 
         Spark.post(
@@ -54,25 +73,16 @@ public class Main {
                     String carStyle = request.queryParams("carStyle");
                     String carColor = request.queryParams("carColor");
                     Car car = new Car(carMake, carModel, carYear, carStyle, carColor);
-
+                    User user = getUserFromSession(request.session());
+                    user.cars.add(car);
+                    response.redirect("/");
+                    return "";
                 })
         );
-//        Spark.post(
-//                "/create-entry",
-//                ((request, response) -> {
-//                    Session session = request.session();
-//                    String userName = session.attribute("userName");
-//                    if (userName == null) {
-//                        throw new Exception("Not logged in.");
-//                    }
-//
-//                    String make = request.queryParams("carMake");
-//                    String model = request.queryParams("carModel");
-//                    String year = request.queryParams("carYear");
-//
-//                })
-//        )
 
 
+    }
+    static User getUserFromSession(Session session) {
+        return session.attribute("user");
     }
 }
