@@ -5,10 +5,7 @@ import spark.Session;
 import spark.Spark;
 import spark.template.mustache.MustacheTemplateEngine;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class Main {
 
@@ -31,8 +28,15 @@ public class Main {
                         }
                         mustacheTags.put("cars", cars);
                         return new ModelAndView(mustacheTags, "login.html");
-                    }
-                    else {
+                    } else if (request.session().attribute("id") != null) {
+                        for (int i = 0; i < user.cars.size(); i++) {
+                            if (request.session().attribute("id").equals(user.cars.get(i).id)) {
+                                request.session().removeAttribute("id");
+                                mustacheTags.put("car", user.cars.get(i));
+                            }
+                        }
+                        return new ModelAndView(mustacheTags, "edit.html");
+                    } else {
                         mustacheTags.put("user", user);
                         mustacheTags.put("cars", user.cars);
                         return new ModelAndView(mustacheTags, "home.html");
@@ -49,13 +53,11 @@ public class Main {
                     if (name == null) {
                         throw new Exception("Login name is null.");
                     }
-
-                    User user = users.get(name);
-                    if (user == null) {
+                    User user = new User(name);
+                    if (!users.containsKey(name)) {
                         user = new User(name);
                         users.put(name, user);
                     }
-
                     Session session = request.session();
                     session.attribute("user", user);
                     response.redirect("/");
@@ -81,9 +83,57 @@ public class Main {
                     int carYear = Integer.valueOf(request.queryParams("carYear"));
                     String carStyle = request.queryParams("carStyle");
                     String carColor = request.queryParams("carColor");
-                    Car car = new Car(carMake, carModel, carYear, carStyle, carColor);
+                    String id  = UUID.randomUUID().toString();
+                    Car car = new Car(carMake, carModel, carYear, carStyle, carColor, id);
                     User user = getUserFromSession(request.session());
                     user.cars.add(car);
+                    response.redirect("/");
+                    return "";
+                })
+        );
+        Spark.post(
+                "/delete-entry",
+                ((request, response) -> {
+                    User user = getUserFromSession(request.session());
+                    for (int i = 0; i < user.cars.size(); i++) {
+                        if (request.queryParams("id").equals(user.cars.get(i).id)) {
+                            user.cars.remove(i);
+                        }
+                    }
+                    response.redirect("/");
+                    return "";
+                })
+        );
+        Spark.post(
+                "/edit-entry",
+                ((request, response) -> {
+                    User user = getUserFromSession(request.session());
+                    for (int i = 0; i < user.cars.size(); i++) {
+                        if (request.queryParams("id").equals(user.cars.get(i).id)) {
+                            request.session().attribute("id", user.cars.get(i).id);
+                        }
+                    }
+                    response.redirect("/");
+                    return user;
+                })
+        );
+        Spark.post(
+                "/perform-update",
+                ((request, response) -> {
+                    String id = request.queryParams("id");
+                    String carMake = request.queryParams("carMake");
+                    String carModel = request.queryParams("carModel");
+                    int carYear = Integer.valueOf(request.queryParams("carYear"));
+                    String carStyle = request.queryParams("carStyle");
+                    String carColor = request.queryParams("carColor");
+                    Car car = new Car(carMake, carModel, carYear, carStyle, carColor, id);
+                    User user = getUserFromSession(request.session());
+                    for (int i = 0; i < user.cars.size(); i++) {
+                        if (request.queryParams("id").equals(user.cars.get(i).id)) {
+                            user.cars.remove(i);
+                            user.cars.add(i, car);
+                        }
+                    }
                     response.redirect("/");
                     return "";
                 })

@@ -9,13 +9,15 @@ public class Car {
     int modelYear;
     String style;
     String color;
+    String id;
 
-    public Car(String make, String model, int modelYear, String style, String color) {
+    public Car(String make, String model, int modelYear, String style, String color, String id) {
         this.make = make;
         this.model = model;
         this.modelYear = modelYear;
         this.style = style;
         this.color = color;
+        this.id = id;
     }
 
     @Override

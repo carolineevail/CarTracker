@@ -1,6 +1,29 @@
 <html>
 <body>
 
+<form action="/perform-update" method="post">
+    id:<input type="text" name="id" value="{{car.id}}">
+    <br/>
+    make:<input type="text" name="carMake" value="{{car.make}}"/>
+    <br/>
+    model:<input type="text" name="carModel" value="{{car.model}}"/>
+    <br/>
+    year:<input type="text" name="carYear" value="{{car.modelYear}}"/>
+    <br/>
+    style:<select name="carStyle">
+        <option selected disabled>{{car.style}}</option>
+        <option value="coupe">Coupe</option>
+        <option value="sedan">Sedan</option>
+        <option value="wagon">Wagon</option>
+        <option value="crossover">Crossover</option>
+        <option value="suv">SUV</option>
+        <option value="truck">Truck</option>
+    </select>
+    <br/>
+    color:<input type="text"  name="carColor" value="{{car.color}}"/>
+    <br/>
+    <input type="submit" value="Submit changes">
+</form>
 
 </body>
 </html>

@@ -30,10 +30,12 @@ Hello, {{user}}
 {{#cars}}
     <li>{{make}} - {{model}} - {{modelYear}} - {{style}} - {{color}}
         <form action="/delete-entry" method="post">
+            <input type="hidden" name="id" value="{{id}}"/>
             <button type="submit">Delete</button>
         </form>
 
         <form action="/edit-entry" method="post">
+            <input type="hidden" name="id" value="{{id}}"/>
             <button type="submit">Edit</button>
         </form>
     </li>
