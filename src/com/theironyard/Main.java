@@ -5,13 +5,91 @@ import spark.Session;
 import spark.Spark;
 import spark.template.mustache.MustacheTemplateEngine;
 
+import java.sql.*;
 import java.util.*;
+
 
 public class Main {
 
+    public static void createTables(Connection conn) throws SQLException {
+        Statement stmt = conn.createStatement();
+        stmt.execute("CREATE TABLE IF NOT EXISTS users (id IDENTITY, name VARCHAR)");
+        stmt.execute("CREATE TABLE IF NOT EXISTS cars (id UUID, user_id INT, make VARCHAR, model VARCHAR, model_year INT, style VARCHAR, color VARCHAR)");
+    }
+
+    public static void insertUser (Connection conn, String name) throws SQLException {
+        PreparedStatement stmt = conn.prepareStatement("INSERT INTO users VALUES (NULL, ?)");
+        stmt.setString(1, name);
+        stmt.execute();
+    }
+
+    public static User selectUser(Connection conn, String name) throws SQLException {
+        PreparedStatement stmt = conn.prepareStatement("SELECT * FROM users WHERE name = ?");
+        stmt.setString(1, name);
+        ResultSet results = stmt.executeQuery();
+        if (results.next()) {
+            int id = results.getInt("id");
+            return new User(name, id);
+        }
+        return null;
+    }
+
+    public static void insertEntry(Connection conn, String id, int userId, String make, String model, int modelYear, String style, String color) throws SQLException {
+        PreparedStatement stmt = conn.prepareStatement("INSERT INTO cars VALUES (NULL, ?, ?, ?, ?, ?, ?)");
+        stmt.setInt(1, userId);
+        stmt.setString(2, make);
+        stmt.setString(3, model);
+        stmt.setInt(4, modelYear);
+        stmt.setString(5, style);
+        stmt.setString(6, color);
+        stmt.execute();
+    }
+
+    public static Car selectEntry(Connection conn, String id) throws SQLException {
+        PreparedStatement stmt = conn.prepareStatement( "SELECT * " +
+                                                        "FROM cars " +
+                                                        "JOIN users " +
+                                                        "ON cars.user_id = users.id " +
+                                                        "WHERE cars.id = ?");
+        stmt.setString(1, id);
+        ResultSet results = stmt.executeQuery();
+        if (results.next()) {
+            String name = results.getString("users.name");
+            String make = results.getString("cars.make");
+            String model = results.getString("cars.model");
+            int modelYear = results.getInt("cars.model_year");
+            String style = results.getString("cars.style");
+            String color = results.getString("cars.color");
+            return new Car(name, make, model, modelYear, style, color);
+        }
+        return null;
+    }
+
+    public static ArrayList<Car> selectEntries(Connection conn) throws SQLException {
+        ArrayList<Car> cars = new ArrayList<>();
+        PreparedStatement stmt = conn.prepareStatement("SELECT * FROM cars INNER JOIN users ON cars.user_id = users.id WHERE cars.");
+        ResultSet results = stmt.executeQuery();
+        while (results.next()); {
+            String name = results.getString("users.name");
+            String make = results.getString("cars.make");
+            String model = results.getString("cars.model");
+            int modelYear = results.getInt("cars.model_year");
+            String style = results.getString("cars.style");
+            String color = results.getString("cars.color");
+            Car car = new Car(name, make, model, modelYear, style, color);
+            cars.add(car);
+        }
+        return cars;
+    }
+
+
+
     static HashMap<String, User> users = new HashMap<>();
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SQLException {
+        Connection conn = DriverManager.getConnection("jdbc:h2:./main");
+        createTables(conn);
+
 
         Spark.init();
         Spark.get(
